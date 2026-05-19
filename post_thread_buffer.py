@@ -100,9 +100,14 @@ def post_to_buffer(tweet_text: str) -> str:
     mutation = """
     mutation CreatePost($input: CreatePostInput!) {
       createPost(input: $input) {
-        post {
-          id
-          status
+        ... on PostActionSuccess {
+          post {
+            id
+            status
+          }
+        }
+        ... on PostActionError {
+          message
         }
       }
     }
@@ -132,7 +137,7 @@ def post_to_buffer(tweet_text: str) -> str:
     if "errors" in data:
         raise Exception(f"Buffer API error: {data['errors']}")
 
-    post_id = data.get("data", {}).get("createPost", {}).get("post", {}).get("id", "unknown")
+    post_id = data.get("data", {}).get("createPost", {}).get("post", {}).get("id") or "queued"
     return post_id
 
 
