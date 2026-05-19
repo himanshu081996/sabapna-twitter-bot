@@ -106,9 +106,6 @@ def post_to_buffer(tweet_text: str) -> str:
             status
           }
         }
-        ... on PostActionError {
-          message
-        }
       }
     }
     """
