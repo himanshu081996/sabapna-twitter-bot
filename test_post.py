@@ -10,15 +10,15 @@ import tweepy
 
 # ── Hardcoded test thread ─────────────────────────────────────────────────────
 TEST_TWEETS = [
-    "This fresher applied to 200 jobs. Got 0 replies. Then changed 1 thing. Got 3 interviews in a week. 🧵",
-    "His name is Rohit. 2023 passout from a tier-3 college in UP. Civil engineering. No coding background.",
-    "For 6 months he applied on Naukri every day. Same resume. Same cover letter. Nothing worked.",
-    "His resume had this at the top: 'Objective: To work in a reputed organization and grow my skills.'",
-    "That line alone was getting him rejected before anyone read further. Recruiters see 300 resumes a day.",
-    "He rewrote the top section. Instead of objective, he wrote 3 bullet points of actual skills and projects.",
-    "Week 1 after the change: 2 calls. Week 2: 1 more. He hadn't changed anything else. Just that one section.",
-    "He got placed at ₹4.2 LPA. Not a dream job. But a start. And he negotiated it up from ₹3.8 LPA.",
-    "If you're a fresher still searching, daily job openings are posted at https://youthnaukri.com 👇 #FresherJobs #Naukri",
+    "This boy from Muzaffarpur, Bihar sent 340 job applications. Got 2 replies. Both rejections. Then his cousin showed him one thing. 3 weeks later he had an offer letter. 🧵",
+    "Meet Rajan Kumar. 2023 BCA passout. Patna University. First in his family to get a degree. His father sells vegetables at the local mandi.",
+    "For 8 months after graduation, Rajan woke up at 6am, opened Naukri.com, and applied to every IT job he could find. Data entry. Support roles. Anything.",
+    "His mother stopped telling relatives he was looking for a job. The questions were too painful. 'Beta kab lagega?' He stopped going to weddings.",
+    "His resume looked like this: 12 pages long. Every school certificate listed. 'Participated in college fest 2019.' Hobbies: 'Cricket and Listening Music.'",
+    "His cousin Vikash, working in Pune, visited during Chhath. Opened Rajan's resume. Went silent for 10 seconds. Then said — 'Yaar, ye delete kar. Sab kuch.'",
+    "They rebuilt it in one evening. 1 page. Clean. 3 projects on top. A GitHub link. Skills listed properly. No 'Objective' line. No hobbies. No 12th marksheet.",
+    "Rajan uploaded the new resume on a Monday night. By Thursday he had 2 calls. By the following week — an interview in Noida. ₹3.8 LPA. He took it without blinking.",
+    "He called his father from the Patna railway station before boarding the train to Noida. His father cried. So did he. First salary — ₹5,000 sent home on day 1. 🙏\n\nIf you're a fresher still searching, fresh jobs posted daily at https://sabapna.com 👇\n#BiharKaBeta #FresherJobs #Naukri",
 ]
 
 
