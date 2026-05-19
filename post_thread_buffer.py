@@ -32,7 +32,7 @@ TOPICS = [
     "Someone who switched from BPO to IT using one free certification",
     "A fresher who cracked a government job while everyone told them to try private sector",
     "A girl who got rejected for lack of communication skills and what she did next",
-    "A fresher from Jharkhand who negotiated salary and got ₹1.5L more than initial offer",
+    "A fresher from Jharkhand who negotiated salary and got 1.5L more than initial offer",
     "A 2022 passout who was about to give up job search but got hired the next week",
 ]
 
@@ -55,7 +55,7 @@ Return ONLY a JSON array of 9 tweet strings, nothing else:
 ["tweet 1", "tweet 2", ..., "tweet 9"]"""
 
 
-def generate_thread(topic: str) -> list[str]:
+def generate_thread(topic: str) -> list:
     """Generate story thread using Claude API."""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
@@ -86,7 +86,6 @@ Return ONLY the JSON array of 9 strings."""
     tweets = json.loads(raw)
     assert len(tweets) >= 3, "Too few tweets"
 
-    # Trim any over 280 chars
     for i, tweet in enumerate(tweets):
         if len(tweet) > 280:
             tweets[i] = tweet[:277] + "..."
@@ -94,33 +93,29 @@ Return ONLY the JSON array of 9 strings."""
     return tweets
 
 
-def post_to_buffer(tweet_text: str, due_at: int = None) -> str:
-    """Post a single tweet to Buffer queue. Returns post ID."""
+def post_to_buffer(tweet_text: str) -> str:
+    """Post a single tweet to Buffer queue."""
     api_key = os.environ["BUFFER_API_KEY"]
 
-    # Schedule time — if not provided, post immediately
-    timing = f'dueAt: "{due_at}"' if due_at else 'scheduleType: next'
-
-    mutation = f"""
-    mutation {{
-      createPost(input: {{
-        organizationId: "{BUFFER_ORG_ID}"
-        channelIds: ["{BUFFER_CHANNEL_ID}"]
-        text: {json.dumps(tweet_text)}
-        {timing}
-      }}) {{
-        ... on PostCreateSuccess {{
-          post {{
-            id
-            status
-          }}
-        }}
-        ... on CoreWebAppCommonError {{
-          message
-        }}
-      }}
-    }}
+    mutation = """
+    mutation CreatePost($input: CreatePostInput!) {
+      createPost(input: $input) {
+        post {
+          id
+          status
+        }
+      }
+    }
     """
+
+    variables = {
+        "input": {
+            "channelId": BUFFER_CHANNEL_ID,
+            "text": tweet_text,
+            "schedulingType": "queue",
+            "mode": "CLEAN"
+        }
+    }
 
     response = requests.post(
         BUFFER_API_URL,
@@ -128,70 +123,62 @@ def post_to_buffer(tweet_text: str, due_at: int = None) -> str:
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         },
-        json={"query": mutation}
+        json={"query": mutation, "variables": variables}
     )
 
     data = response.json()
+    print(f"  Raw response: {json.dumps(data)}")
 
     if "errors" in data:
         raise Exception(f"Buffer API error: {data['errors']}")
 
-    result = data.get("data", {}).get("createPost", {})
-    if "message" in result:
-        raise Exception(f"Buffer post error: {result['message']}")
-
-    post_id = result.get("post", {}).get("id", "unknown")
+    post_id = data.get("data", {}).get("createPost", {}).get("post", {}).get("id", "unknown")
     return post_id
 
 
-def post_thread_to_buffer(tweets: list[str]) -> None:
-    """Post all tweets to Buffer queue with delay between each."""
-    print(f"📤 Queuing {len(tweets)} tweets to Buffer...")
+def post_thread_to_buffer(tweets: list) -> None:
+    """Post all tweets to Buffer queue."""
+    print(f"Queuing {len(tweets)} tweets to Buffer...")
 
     for i, tweet_text in enumerate(tweets):
         print(f"  Queuing tweet {i+1}/{len(tweets)}: {tweet_text[:60]}...")
         post_id = post_to_buffer(tweet_text)
-        print(f"  ✅ Queued — Buffer post ID: {post_id}")
+        print(f"  Queued — Buffer post ID: {post_id}")
         time.sleep(2)
 
-    print(f"\n🎉 All {len(tweets)} tweets queued in Buffer!")
+    print(f"\nAll {len(tweets)} tweets queued in Buffer!")
     print(f"Buffer will post them to @kaelai_x automatically.")
 
 
 def main():
-    print("🚀 Sabapna Twitter Bot starting...")
+    print("Sabapna Twitter Bot starting...")
 
-    # Step 1: Pick topic
     topic = random.choice(TOPICS)
-    print(f"📝 Topic: {topic}\n")
+    print(f"Topic: {topic}\n")
 
-    # Step 2: Check if Claude API key exists
     if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("⚠️  No ANTHROPIC_API_KEY found — using hardcoded test thread")
+        print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "This boy from Muzaffarpur, Bihar sent 340 job applications. Got 2 replies. Both rejections. Then his cousin showed him one thing. 3 weeks later he had an offer letter. 🧵",
+            "This boy from Muzaffarpur, Bihar sent 340 job applications. Got 2 replies. Both rejections. Then his cousin showed him one thing. 3 weeks later he had an offer letter.",
             "Meet Rajan Kumar. 2023 BCA passout. Patna University. First in his family to get a degree. His father sells vegetables at the local mandi.",
             "For 8 months after graduation, Rajan woke up at 6am, opened Naukri.com, and applied to every IT job he could find. Data entry. Support roles. Anything.",
-            "His mother stopped telling relatives he was looking for a job. The questions were too painful. 'Beta kab lagega?' He stopped going to weddings.",
-            "His resume looked like this: 12 pages long. Every school certificate listed. 'Participated in college fest 2019.' Hobbies: 'Cricket and Listening Music.'",
-            "His cousin Vikash, working in Pune, visited during Chhath. Opened Rajan's resume. Went silent for 10 seconds. Then said — 'Yaar, ye delete kar. Sab kuch.'",
-            "They rebuilt it in one evening. 1 page. Clean. 3 projects on top. A GitHub link. Skills listed properly. No 'Objective' line. No hobbies. No 12th marksheet.",
-            "Rajan uploaded the new resume on a Monday night. By Thursday he had 2 calls. By the following week — an interview in Noida. ₹3.8 LPA. He took it without blinking.",
-            f"He called his father from Patna station before boarding the train to Noida. His father cried. So did he. First salary — ₹5,000 sent home on day 1. 🙏\n\nFresh jobs daily at {WEBSITE_URL} 👇\n#FresherJobs #Naukri",
+            "His mother stopped telling relatives he was looking for a job. The questions were too painful. Beta kab lagega? He stopped going to weddings.",
+            "His resume looked like this: 12 pages long. Every school certificate listed. Participated in college fest 2019. Hobbies: Cricket and Listening Music.",
+            "His cousin Vikash, working in Pune, visited during Chhath. Opened Rajan's resume. Went silent for 10 seconds. Then said: Yaar, ye delete kar. Sab kuch.",
+            "They rebuilt it in one evening. 1 page. Clean. 3 projects on top. A GitHub link. Skills listed properly. No Objective line. No hobbies. No 12th marksheet.",
+            "Rajan uploaded the new resume on a Monday night. By Thursday he had 2 calls. By the following week — an interview in Noida. 3.8 LPA. He took it without blinking.",
+            f"He called his father from Patna station before boarding the train to Noida. His father cried. So did he. First salary 5000 sent home on day 1.\n\nFresh jobs daily at {WEBSITE_URL}\n#FresherJobs #Naukri",
         ]
     else:
-        # Step 2: Generate with Claude
-        print("🤖 Generating thread with Claude...")
+        print("Generating thread with Claude...")
         tweets = generate_thread(topic)
-        print(f"✅ Generated {len(tweets)} tweets\n")
+        print(f"Generated {len(tweets)} tweets\n")
 
-    # Step 3: Preview
     print("--- THREAD PREVIEW ---")
     for i, tweet in enumerate(tweets):
         print(f"[{i+1}] ({len(tweet)} chars)\n{tweet}\n")
     print("----------------------\n")
 
-    # Step 4: Post to Buffer
     post_thread_to_buffer(tweets)
 
 
