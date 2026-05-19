@@ -15,7 +15,7 @@ import anthropic
 WEBSITE_URL = "https://sabapna.com"
 BUFFER_CHANNEL_ID = "6a0c3e98090476fb99371f8e"
 BUFFER_ORG_ID = "6a0c3e251cfeb0c86e94338c"
-BUFFER_API_URL = "https://api.buffer.com/graphql"
+BUFFER_API_URL = "https://api.buffer.com"
 
 # ── Topic Pool ────────────────────────────────────────────────────────────────
 TOPICS = [
@@ -97,26 +97,31 @@ def post_to_buffer(tweet_text: str) -> str:
     """Post a single tweet to Buffer queue."""
     api_key = os.environ["BUFFER_API_KEY"]
 
+    # Note: schedulingType and mode are GraphQL enums — must NOT be quoted strings
     mutation = """
-    mutation CreatePost($input: CreatePostInput!) {
-      createPost(input: $input) {
+    mutation CreatePost($text: String!, $channelId: ChannelId!) {
+      createPost(input: {
+        text: $text
+        channelId: $channelId
+        schedulingType: automatic
+        mode: addToQueue
+      }) {
         ... on PostActionSuccess {
           post {
             id
-            status
+            text
           }
+        }
+        ... on MutationError {
+          message
         }
       }
     }
     """
 
     variables = {
-        "input": {
-            "channelId": BUFFER_CHANNEL_ID,
-            "text": tweet_text,
-            "schedulingType": "queue",
-            "mode": "CLEAN"
-        }
+        "text": tweet_text,
+        "channelId": BUFFER_CHANNEL_ID,
     }
 
     response = requests.post(
@@ -134,7 +139,11 @@ def post_to_buffer(tweet_text: str) -> str:
     if "errors" in data:
         raise Exception(f"Buffer API error: {data['errors']}")
 
-    post_id = data.get("data", {}).get("createPost", {}).get("post", {}).get("id") or "queued"
+    result = data.get("data", {}).get("createPost", {})
+    if "message" in result:
+        raise Exception(f"Buffer post failed: {result['message']}")
+
+    post_id = result.get("post", {}).get("id") or "queued"
     return post_id
 
 
