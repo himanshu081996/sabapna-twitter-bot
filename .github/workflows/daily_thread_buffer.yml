@@ -1,11 +1,7 @@
 name: Sabapna - Daily Twitter Thread (via Buffer)
 
 on:
-  schedule:
-    # Runs every day at 9:00 AM IST (3:30 AM UTC)
-    - cron: "30 3 * * *"
-
-  # Manual trigger from GitHub Actions tab
+  # Manual trigger only
   workflow_dispatch:
 
 jobs:
