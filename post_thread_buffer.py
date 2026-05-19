@@ -99,9 +99,10 @@ def post_thread_to_buffer(tweets: list) -> None:
 
     api_key = os.environ["BUFFER_API_KEY"]
 
-    # Tweet 1 is the main text, tweets 2-9 go into metadata.twitter.thread
+    # Tweet 1 is the main text (shown as the post preview)
+    # ALL tweets including tweet 1 go into thread array so nothing is skipped
     main_text = tweets[0]
-    threaded_posts = [{"text": t} for t in tweets[1:]]
+    threaded_posts = [{"text": t} for t in tweets]  # all 9 tweets in thread
 
     # Schedule 30 seconds from now
     due_at = (datetime.now(timezone.utc) + timedelta(seconds=30)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
@@ -178,15 +179,23 @@ def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "My cousin spent 11 months applying for jobs after graduation. 400+ applications. 3 interviews. 0 offers. Then one evening changed everything. 🧵",
-            "Priya. 2023 B.Com passout. Allahabad University. Her father is a retired government clerk. Her mother stitches clothes at home. She was their only hope.",
-            "Every morning she woke up at 7. Opened Naukri, Indeed, LinkedIn. Applied till her eyes hurt. Night mein roti khate waqt nobody spoke. The silence was heavy.",
-            "Relatives stopped asking about her job after month 4. Log samajh gaye the. Her younger brother quietly started skipping tuition fees to save money.",
-            "Month 8. She got one interview call. Traveled 3 hours by bus to Lucknow. Waited 2 hours. They said: sorry, we need someone with experience. She cried on the bus home.",
-            "That night her father said something she'll never forget: Beta, ek baar aur try kar. Bas ek baar. He said it quietly. No drama. Just faith. That broke her open.",
-            "She stopped mass-applying. Built 2 small Excel projects. Wrote about them properly on her resume. Reached out to 10 HR people on LinkedIn with a real message. Not copy-paste.",
-            "Day 11. One HR replied. Phone call. Then a video interview. Then silence for 5 days. Then an email: Congratulations. 3.2 LPA. Accounts executive. Noida.",
-            f"First thing she did after getting the offer: Called her father. He picked up on the first ring. She said: Papa, ho gaya. He didn't say anything for 10 seconds. Then: Shukriya beta.\n\nIf you're still searching — fresh jobs updated daily at {WEBSITE_URL} 👇\n#FresherJobs #JobSearch",
+            "My cousin spent 11 months applying for jobs after graduation.\n\n400+ applications. 3 interviews. 0 offers.\n\nEverybody told her to try something else. She didn't listen.\n\nThen one evening changed everything. 🧵",
+
+            "Her name is Priya. 2023 B.Com passout from Allahabad University.\n\nFirst person in her family to get a degree.\n\nHer father is a retired government clerk. Pension: ₹9,000/month. Her mother stitches blouses at home — ₹3,000 in a good month.\n\nPriya was their plan.",
+
+            "Every single morning for 11 months, she woke up at 7am.\n\nOpened Naukri. Indeed. LinkedIn. Shine. Sometimes Internshala.\n\nApplied to everything — data entry, billing executive, back office, telecalling. Anything that said 'freshers welcome.'\n\nShe applied till her eyes burned. Then applied some more.",
+
+            "The dinner table became a quiet place.\n\nNobody asked. Nobody commented. But the silence said everything.\n\nAfter month 4, relatives stopped asking 'kya hua job ka?' at family functions.\n\nLog samajh gaye the.\n\nHer younger brother quietly started skipping his coaching classes to save ₹800/month. He never told her. She found out later.",
+
+            "Month 8. Finally — one interview call.\n\nA small accounting firm in Lucknow. She ironed her only formal shirt the night before. Woke up at 5am. Took a 3-hour bus.\n\nWaited in their lobby for 2 hours.\n\nThe interviewer spent 6 minutes with her. Then said:\n\n'Sorry, we need someone with at least 1 year experience.'\n\nShe held it together till she reached the bus stand. Then cried the whole ride home.",
+
+            "That night, her father did something he almost never does.\n\nHe came to her room. Sat on the edge of her bed. Didn't say much.\n\nJust: 'Beta, ek baar aur try kar. Bas ek baar.'\n\nNo lecture. No pressure. No disappointment in his voice. Just quiet, tired faith.\n\nShe said that one line broke her open more than 11 months of rejection ever did.",
+
+            "She changed everything the next week.\n\nStopped mass applying. Started from scratch.\n\nBuilt 2 real projects — one Excel MIS report tracker, one accounts reconciliation sheet. Put them on Google Drive. Added the link to her resume.\n\nReduced resume from 3 pages to 1.\n\nWrote 10 personalized LinkedIn messages to HR people — not 'please refer me ma'am' — actual messages about why she was interested in their company.",
+
+            "Day 11 of the new approach.\n\nOne HR from a logistics company in Noida replied.\n\nPhone screening. Then a video interview. She showed them her Excel project on screen share. The interviewer said: 'This is good work.'\n\nThen 5 days of silence. She refreshed her email every hour.\n\nThen at 6:43pm on a Thursday: 'Congratulations. We'd like to offer you the position of Accounts Executive. CTC: ₹3.2 LPA.'",
+
+            f"She called her father immediately.\n\nHe picked up on the first ring — he always does when she calls.\n\nShe said: 'Papa. Ho gaya.'\n\nHe didn't say anything for almost 10 seconds.\n\nThen, very quietly: 'Shukriya beta.'\n\nThat was it. Two words. But she knew.\n\n—\n\nIf you're a fresher still searching — don't give up. Fresh job openings posted daily at {WEBSITE_URL} 👇\n\n#FresherJobs #JobSearch #IndianFreshers",
         ]
     else:
         print("Generating thread with Claude...")
