@@ -179,23 +179,23 @@ def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "My cousin spent 11 months applying for jobs after graduation.\n\n400+ applications. 3 interviews. 0 offers.\n\nEverybody told her to try something else. She didn't listen.\n\nThen one evening changed everything. 🧵",
-
-            "Her name is Priya. 2023 B.Com passout from Allahabad University.\n\nFirst person in her family to get a degree.\n\nHer father is a retired government clerk. Pension: ₹9,000/month. Her mother stitches blouses at home — ₹3,000 in a good month.\n\nPriya was their plan.",
-
-            "Every single morning for 11 months, she woke up at 7am.\n\nOpened Naukri. Indeed. LinkedIn. Shine. Sometimes Internshala.\n\nApplied to everything — data entry, billing executive, back office, telecalling. Anything that said 'freshers welcome.'\n\nShe applied till her eyes burned. Then applied some more.",
-
-            "The dinner table became a quiet place.\n\nNobody asked. Nobody commented. But the silence said everything.\n\nAfter month 4, relatives stopped asking 'kya hua job ka?' at family functions.\n\nLog samajh gaye the.\n\nHer younger brother quietly started skipping his coaching classes to save ₹800/month. He never told her. She found out later.",
-
-            "Month 8. Finally — one interview call.\n\nA small accounting firm in Lucknow. She ironed her only formal shirt the night before. Woke up at 5am. Took a 3-hour bus.\n\nWaited in their lobby for 2 hours.\n\nThe interviewer spent 6 minutes with her. Then said:\n\n'Sorry, we need someone with at least 1 year experience.'\n\nShe held it together till she reached the bus stand. Then cried the whole ride home.",
-
-            "That night, her father did something he almost never does.\n\nHe came to her room. Sat on the edge of her bed. Didn't say much.\n\nJust: 'Beta, ek baar aur try kar. Bas ek baar.'\n\nNo lecture. No pressure. No disappointment in his voice. Just quiet, tired faith.\n\nShe said that one line broke her open more than 11 months of rejection ever did.",
-
-            "She changed everything the next week.\n\nStopped mass applying. Started from scratch.\n\nBuilt 2 real projects — one Excel MIS report tracker, one accounts reconciliation sheet. Put them on Google Drive. Added the link to her resume.\n\nReduced resume from 3 pages to 1.\n\nWrote 10 personalized LinkedIn messages to HR people — not 'please refer me ma'am' — actual messages about why she was interested in their company.",
-
-            "Day 11 of the new approach.\n\nOne HR from a logistics company in Noida replied.\n\nPhone screening. Then a video interview. She showed them her Excel project on screen share. The interviewer said: 'This is good work.'\n\nThen 5 days of silence. She refreshed her email every hour.\n\nThen at 6:43pm on a Thursday: 'Congratulations. We'd like to offer you the position of Accounts Executive. CTC: ₹3.2 LPA.'",
-
-            f"She called her father immediately.\n\nHe picked up on the first ring — he always does when she calls.\n\nShe said: 'Papa. Ho gaya.'\n\nHe didn't say anything for almost 10 seconds.\n\nThen, very quietly: 'Shukriya beta.'\n\nThat was it. Two words. But she knew.\n\n—\n\nIf you're a fresher still searching — don't give up. Fresh job openings posted daily at {WEBSITE_URL} 👇\n\n#FresherJobs #JobSearch #IndianFreshers",
+            "A girl passed her 12th from a government school in Varanasi.\n\nNo degree. No connections. No English.\n\nEveryone said: ab shaadi kar lo. Kya hoga padh ke?\n\nShe proved every single one of them wrong. 🧵",
+ 
+            "I share real stories like this every week.\n\nIf you're searching for work right now — sabapna.com has fresh jobs updated daily. For freshers, 12th pass, graduates — everyone.\n\nAb Sunita ki baat karte hain. 👇",
+ 
+            "Sunita Yadav. 2022. 12th pass. Commerce stream. Government inter college, Varanasi.\n\nHer father drives an e-rickshaw. Earns ₹400-500 on a good day.\n\nShe has two younger sisters. Both still in school.\n\nAfter 12th, her relatives said one thing unanimously: ladki hai. Ghar sambhalo. Degree ki kya zaroorat?\n\nHer mother quietly disagreed. Never said it loudly. But disagreed.",
+ 
+            "Sunita wanted to work. Earn. Contribute.\n\nBut nobody would hire a 12th pass girl with no experience and broken English.\n\nShe went to 6 shops in her area asking for billing or counter work.\n\nAll 6 said no.\n\nOne shopkeeper said: 'Degree lao pehle.'\n\nShe didn't have money for degree. That was the whole problem.",
+ 
+            "Month 5 of searching.\n\nHer cousin's wedding came. Everyone dressed up. Photos everywhere.\n\nA relative pulled her mother aside: 'Sunita ka kya plan hai? Rishte dekhne chahiye ab.'\n\nHer mother smiled and said nothing.\n\nThat night Sunita heard her parents talking in the kitchen. Her father said: 'Padhai mein itna invest kar diya. Kuch kaam ka nikla nahi.'\n\nShe put a pillow on her face and screamed into it.",
+ 
+            "Her school friend Meenu called her one evening.\n\nMeenu had joined a data entry job. ₹8,000/month. Work from home. Company hired 12th pass.\n\nSunita said: 'Mujhe bhi batao kaise kiya?'\n\nMeenu sent her the company's form. And one more thing — a free typing speed course link on YouTube.\n\nSunita had never thought of typing as a skill. She could type fast. She'd just never called it a skill.",
+ 
+            "She practiced typing for 3 weeks. 45 minutes every morning before anyone woke up.\n\nWent from 20 words per minute to 55.\n\nMade a simple one-page resume on her phone using a free template.\n\nWrote: 'Typing speed: 55 WPM. MS Excel basic. Hindi and English data entry.'\n\nApplied to 11 companies that said '12th pass welcome.'\n\nWrote each application by hand in a notebook first, then typed it. She wanted every word to be right.",
+ 
+            "Company number 7 replied.\n\nA small fintech startup in Noida needed a data entry operator for their KYC team. Remote work allowed.\n\nOne typing test online. One 10-minute phone call.\n\nThe HR asked: 'Aapko WFH mein comfortable rehna hai?'\n\nSunita said: 'Haan bilkul.'\n\nOffer: ₹9,500/month. Work from home. Start in 2 weeks.\n\nShe read the email 4 times to make sure it was real.",
+ 
+            f"Fresh jobs at {WEBSITE_URL} 👇\n12th pass, graduate, fresher — sab ke liye.\n\n—\n\nShe didn't tell anyone for one full day.\n\nJust kept the email open on her phone. Read it every hour.\n\nThe next morning she told her mother.\n\nHer mother held her face in both hands and said nothing for a long time.\n\nThen: 'Tere baap ko batate hain. Aaj achha khana banega.'\n\nHer father came home at 8pm. Tired as always. She showed him the email.\n\nHe read it slowly. Looked up. Said: 'Shukriya beta.'\n\nHer younger sisters don't know yet what she proved that day. But they will.\n\n#12thPassJobs #FresherJobs #WomenWhoWork",
         ]
     else:
         print("Generating thread with Claude...")
