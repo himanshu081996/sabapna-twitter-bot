@@ -93,23 +93,25 @@ Return ONLY the JSON array of 9 strings."""
     return tweets
 
 
-def post_to_buffer(tweet_text: str) -> str:
-    """Post a single tweet to Buffer queue."""
+def post_to_buffer(tweet_text: str, due_at: str) -> str:
+    """Post a single tweet to Buffer at a specific time."""
     api_key = os.environ["BUFFER_API_KEY"]
 
-    # Note: schedulingType and mode are GraphQL enums — must NOT be quoted strings
+    # Use customScheduled mode with explicit dueAt time for instant/controlled posting
     mutation = """
-    mutation CreatePost($text: String!, $channelId: ChannelId!) {
+    mutation CreatePost($text: String!, $channelId: ChannelId!, $dueAt: DateTime!) {
       createPost(input: {
         text: $text
         channelId: $channelId
         schedulingType: automatic
-        mode: addToQueue
+        mode: customScheduled
+        dueAt: $dueAt
       }) {
         ... on PostActionSuccess {
           post {
             id
             text
+            dueAt
           }
         }
         ... on MutationError {
@@ -122,6 +124,7 @@ def post_to_buffer(tweet_text: str) -> str:
     variables = {
         "text": tweet_text,
         "channelId": BUFFER_CHANNEL_ID,
+        "dueAt": due_at,
     }
 
     response = requests.post(
@@ -144,21 +147,28 @@ def post_to_buffer(tweet_text: str) -> str:
         raise Exception(f"Buffer post failed: {result['message']}")
 
     post_id = result.get("post", {}).get("id") or "queued"
-    return post_id
+    due = result.get("post", {}).get("dueAt", "")
+    return post_id, due
 
 
 def post_thread_to_buffer(tweets: list) -> None:
-    """Post all tweets to Buffer queue."""
-    print(f"Queuing {len(tweets)} tweets to Buffer...")
+    """Post all tweets to Buffer with 2-minute gaps starting from now."""
+    from datetime import datetime, timezone, timedelta
+
+    print(f"Scheduling {len(tweets)} tweets to Buffer starting now...")
+
+    # Start 1 minute from now, then 2 min gaps between tweets
+    base_time = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     for i, tweet_text in enumerate(tweets):
-        print(f"  Queuing tweet {i+1}/{len(tweets)}: {tweet_text[:60]}...")
-        post_id = post_to_buffer(tweet_text)
-        print(f"  Queued — Buffer post ID: {post_id}")
-        time.sleep(2)
+        due_at = (base_time + timedelta(minutes=i * 2)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        print(f"  Scheduling tweet {i+1}/{len(tweets)} at {due_at}: {tweet_text[:50]}...")
+        post_id, due = post_to_buffer(tweet_text, due_at)
+        print(f"  Scheduled — ID: {post_id} | Time: {due}")
+        time.sleep(1)
 
-    print(f"\nAll {len(tweets)} tweets queued in Buffer!")
-    print(f"Buffer will post them to @kaelai_x automatically.")
+    print(f"\nAll {len(tweets)} tweets scheduled!")
+    print(f"They will post 2 minutes apart starting in ~1 minute.")
 
 
 def main():
