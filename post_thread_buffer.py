@@ -93,19 +93,32 @@ Return ONLY the JSON array of 9 strings."""
     return tweets
 
 
-def post_to_buffer(tweet_text: str, due_at: str) -> str:
-    """Post a single tweet to Buffer at a specific time."""
+def post_thread_to_buffer(tweets: list) -> None:
+    """Post all 9 tweets as a single Twitter thread via Buffer API."""
+    from datetime import datetime, timezone, timedelta
+
     api_key = os.environ["BUFFER_API_KEY"]
 
-    # Use customScheduled mode with explicit dueAt time for instant/controlled posting
+    # Tweet 1 is the main text, tweets 2-9 go into metadata.twitter.thread
+    main_text = tweets[0]
+    threaded_posts = [{"text": t} for t in tweets[1:]]
+
+    # Schedule 30 seconds from now
+    due_at = (datetime.now(timezone.utc) + timedelta(seconds=30)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
     mutation = """
-    mutation CreatePost($text: String!, $channelId: ChannelId!, $dueAt: DateTime!) {
+    mutation CreateThread($text: String!, $channelId: ChannelId!, $dueAt: DateTime!, $thread: [ThreadedPostInput!]!) {
       createPost(input: {
         text: $text
         channelId: $channelId
         schedulingType: automatic
         mode: customScheduled
         dueAt: $dueAt
+        metadata: {
+          twitter: {
+            thread: $thread
+          }
+        }
       }) {
         ... on PostActionSuccess {
           post {
@@ -122,10 +135,14 @@ def post_to_buffer(tweet_text: str, due_at: str) -> str:
     """
 
     variables = {
-        "text": tweet_text,
+        "text": main_text,
         "channelId": BUFFER_CHANNEL_ID,
         "dueAt": due_at,
+        "thread": threaded_posts,
     }
+
+    print(f"Posting thread of {len(tweets)} tweets to Buffer...")
+    print(f"Scheduled for: {due_at}")
 
     response = requests.post(
         BUFFER_API_URL,
@@ -137,7 +154,7 @@ def post_to_buffer(tweet_text: str, due_at: str) -> str:
     )
 
     data = response.json()
-    print(f"  Raw response: {json.dumps(data)}")
+    print(f"Raw response: {json.dumps(data)}")
 
     if "errors" in data:
         raise Exception(f"Buffer API error: {data['errors']}")
@@ -146,29 +163,10 @@ def post_to_buffer(tweet_text: str, due_at: str) -> str:
     if "message" in result:
         raise Exception(f"Buffer post failed: {result['message']}")
 
-    post_id = result.get("post", {}).get("id") or "queued"
+    post_id = result.get("post", {}).get("id") or "unknown"
     due = result.get("post", {}).get("dueAt", "")
-    return post_id, due
-
-
-def post_thread_to_buffer(tweets: list) -> None:
-    """Post all tweets to Buffer with 2-minute gaps starting from now."""
-    from datetime import datetime, timezone, timedelta
-
-    print(f"Scheduling {len(tweets)} tweets to Buffer starting now...")
-
-    # Start 1 minute from now, then 2 min gaps between tweets
-    base_time = datetime.now(timezone.utc) + timedelta(minutes=1)
-
-    for i, tweet_text in enumerate(tweets):
-        due_at = (base_time + timedelta(minutes=i * 2)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        print(f"  Scheduling tweet {i+1}/{len(tweets)} at {due_at}: {tweet_text[:50]}...")
-        post_id, due = post_to_buffer(tweet_text, due_at)
-        print(f"  Scheduled — ID: {post_id} | Time: {due}")
-        time.sleep(1)
-
-    print(f"\nAll {len(tweets)} tweets scheduled!")
-    print(f"They will post 2 minutes apart starting in ~1 minute.")
+    print(f"\nThread scheduled! Buffer post ID: {post_id}")
+    print(f"Will post as a thread at: {due}")
 
 
 def main():
@@ -180,15 +178,15 @@ def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "This boy from Muzaffarpur, Bihar sent 340 job applications. Got 2 replies. Both rejections. Then his cousin showed him one thing. 3 weeks later he had an offer letter.",
-            "Meet Rajan Kumar. 2023 BCA passout. Patna University. First in his family to get a degree. His father sells vegetables at the local mandi.",
-            "For 8 months after graduation, Rajan woke up at 6am, opened Naukri.com, and applied to every IT job he could find. Data entry. Support roles. Anything.",
-            "His mother stopped telling relatives he was looking for a job. The questions were too painful. Beta kab lagega? He stopped going to weddings.",
-            "His resume looked like this: 12 pages long. Every school certificate listed. Participated in college fest 2019. Hobbies: Cricket and Listening Music.",
-            "His cousin Vikash, working in Pune, visited during Chhath. Opened Rajan's resume. Went silent for 10 seconds. Then said: Yaar, ye delete kar. Sab kuch.",
-            "They rebuilt it in one evening. 1 page. Clean. 3 projects on top. A GitHub link. Skills listed properly. No Objective line. No hobbies. No 12th marksheet.",
-            "Rajan uploaded the new resume on a Monday night. By Thursday he had 2 calls. By the following week — an interview in Noida. 3.8 LPA. He took it without blinking.",
-            f"He called his father from Patna station before boarding the train to Noida. His father cried. So did he. First salary 5000 sent home on day 1.\n\nFresh jobs daily at {WEBSITE_URL}\n#FresherJobs #Naukri",
+            "My cousin spent 11 months applying for jobs after graduation. 400+ applications. 3 interviews. 0 offers. Then one evening changed everything. 🧵",
+            "Priya. 2023 B.Com passout. Allahabad University. Her father is a retired government clerk. Her mother stitches clothes at home. She was their only hope.",
+            "Every morning she woke up at 7. Opened Naukri, Indeed, LinkedIn. Applied till her eyes hurt. Night mein roti khate waqt nobody spoke. The silence was heavy.",
+            "Relatives stopped asking about her job after month 4. Log samajh gaye the. Her younger brother quietly started skipping tuition fees to save money.",
+            "Month 8. She got one interview call. Traveled 3 hours by bus to Lucknow. Waited 2 hours. They said: sorry, we need someone with experience. She cried on the bus home.",
+            "That night her father said something she'll never forget: Beta, ek baar aur try kar. Bas ek baar. He said it quietly. No drama. Just faith. That broke her open.",
+            "She stopped mass-applying. Built 2 small Excel projects. Wrote about them properly on her resume. Reached out to 10 HR people on LinkedIn with a real message. Not copy-paste.",
+            "Day 11. One HR replied. Phone call. Then a video interview. Then silence for 5 days. Then an email: Congratulations. 3.2 LPA. Accounts executive. Noida.",
+            f"First thing she did after getting the offer: Called her father. He picked up on the first ring. She said: Papa, ho gaya. He didn't say anything for 10 seconds. Then: Shukriya beta.\n\nIf you're still searching — fresh jobs updated daily at {WEBSITE_URL} 👇\n#FresherJobs #JobSearch",
         ]
     else:
         print("Generating thread with Claude...")
