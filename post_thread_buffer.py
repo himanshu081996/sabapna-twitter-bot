@@ -179,23 +179,23 @@ def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "A girl from a village in Madhya Pradesh had no smartphone.\n\nNo laptop. No WiFi. No coaching.\n\nEveryone said: Nothing will happen from here.\n\nShe got a job before her engineering friends did. 🧵",
- 
-            f"I share stories like this every week.\n\nIf you are still searching — sabapna.com posts fresh jobs daily. For freshers, 12th pass, graduates — everyone is welcome.\n\nThis is Rekha's story. 👇",
- 
-            "Rekha Patel. 22 years old. Sehore, Madhya Pradesh.\n\nPopulation of her village: ~800 people.\nNearest city: 40km away.\nHer father: daily wage labourer. ₹300-350/day.\nHer phone: a basic keypad Nokia. No internet.\n\nShe passed 12th with 74%. Commerce stream.\nDistrict school. Hindi medium.",
- 
-            "After 12th, her options were:\n\n• Get married (relatives' suggestion)\n• Work at a local kirana store (₹2,500/month)\n• Go to Bhopal, find something somehow\n\nHer father said: You will have to go to Bhopal. Nothing will come of staying here.\n\nHe had ₹8,000 saved.\nGave her ₹6,000.\nKept ₹2,000 for the house.\n\nShe took a bus to Bhopal alone for the first time in her life.",
- 
-            "Bhopal was overwhelming.\n\nShe did not know how to use a smartphone properly.\nCould not operate a laptop.\nHer Hindi-medium background made her freeze in interviews.\n\nFirst week:\n• 3 walk-in interviews\n• 3 rejections\n• Reason given: No computer knowledge\n\nShe called her father that night.\n\nHe said: Stay. One more week.\n\nShe stayed.",
- 
-            "A woman at her PG — Savitri — worked at a computer training institute.\n\nShe saw Rekha sitting alone one evening. Asked what happened.\n\nRekha told her everything.\n\nSavitri said: Come with me tomorrow. I will teach you for free.\n\nFor 3 weeks, Rekha went every morning.\n\nMS Excel. MS Word. Basic typing. Email writing.\n\nShe practiced on the institute computers. 2 hours every day. For free.",
- 
-            "After 3 weeks she could:\n\n• Type 40 WPM\n• Make basic Excel sheets\n• Write a proper email in English\n• Operate a computer without freezing\n\nShe made a 1-page resume. Savitri helped her write it.\n\nApplied to 14 companies in Bhopal.\nWalk-ins. Job fairs. WhatsApp groups.\n\nHer engineering friends back home were still waiting for campus placements.",
- 
-            "Company number 9 called back.\n\nA small logistics firm. Data entry and billing work.\n\nInterview: 20 minutes.\nTyping test: cleared.\nBasic English: fine.\n\nOffer:\n• ₹10,500/month\n• In-office. Bhopal.\n• Start Monday.\n\nShe read the offer letter 3 times.\n\nThen went to a STD booth and called her father.\n\nHis first question: Are you okay? Are you eating properly?",
- 
-            f"Fresh jobs at {WEBSITE_URL} 👇\n12th pass, fresher, graduate — everyone is welcome.\n\n—\n\nShe sent ₹3,000 home on her first salary day.\n\nHer father called back.\n\nHe said: Do not send so much. Keep it for yourself.\n\nShe said: You gave me ₹6,000. I am returning half.\n\nLong silence.\n\nThen: Come home once. Your mother has been asking about you.\n\nHer engineering friends got placed 4 months later.\nRekha had already completed her probation.\n\nNo smartphone. No laptop. No WiFi.\n\nJust one woman who said: Come with me tomorrow.\n\n#FresherJobs #WomenWhoWork #RuralIndia",
+            "My father gave 31 years to a job.\n\nOn his last day I asked: any regrets?\n\nHe did not mention the salary.\nHe did not mention the missed promotions.\n\nWhat he said instead — I was not ready for it. 🧵",
+
+            f"I share stories like this because they matter.\n\nIf you are searching for work right now — {WEBSITE_URL} posts fresh jobs daily. Freshers, graduates, everyone welcome.\n\nNow. My father's story. 👇",
+
+            "His name is Rajendra.\n\nGovernment clerk. District office. Haryana.\n\nJoined in 1993 at age 24.\nSalary: ₹3,400/month.\n\nHe wore the same two formal shirts for the first 4 years.\nWashed them every night. Ironed them every morning.\n\nNobody at the office ever knew.",
+
+            "He woke up at 5:30am every single day for 31 years.\n\nNo alarm needed. His body just knew.\n\nRain. Fever. Back pain. The day after my grandfather died.\n\nHe showed up.\n\nI was always asleep when he left.\n\nWe never once had breakfast together on a weekday.\n\nI only realized this when I was 19.",
+
+            "When I was 14 I asked him why he never switched jobs.\n\nHalf our colony had moved to private companies.\nEveryone was talking about better salaries.\n\nHe looked at me and said:\n\n\"Beta, security matters more than salary.\nA government job means your family never sleeps hungry.\"\n\nI nodded. I did not argue.\n\nBut something about that answer never sat right with me.",
+
+            "Things I found out about later. From my mother. Never from him.\n\n• His best friend's wedding in Chandigarh — he could not get leave.\n• My school annual function where I got first prize — he was in a file audit.\n• Our only family trip to Shimla — he got called back on day 2.\n\nHe never mentioned any of it.\n\nNot once.",
+
+            "Last month he retired.\n\n31 years. Same desk. Same chair. Same office.\n\nSalary when he joined: ₹3,400/month.\nSalary when he retired: ₹41,000/month.\n\n31 years. ₹37,600 raise.\n\nThat is ₹1,213 per year.\n\nHis colleagues had a small lunch. Someone made a card. Everyone signed it.\n\nHe came home at 4pm with a cardboard box of his belongings.\n\nPut it in the corner of the bedroom. Did not say anything.",
+
+            "That evening I sat with him.\n\nJust the two of us.\n\nI asked: \"Papa, any regrets?\"\n\nHe was quiet for a long time.\n\nI thought he would say the salary.\nOr the promotion that went to someone else in 2009.\nOr the transfer request that was rejected 3 times.\n\nHe said none of that.\n\nHe looked at me and said:\n\n\"I wish I had dropped you to school more.\"\n\nThat was it.\n\n31 years. And that was the only thing he wished he had done differently.",
+
+            f"Fresh jobs at {WEBSITE_URL} 👇\nFind work that pays fairly. And gives you time.\n\n—\n\nMy father gave 31 years to a desk.\n\nHis only regret is time.\n\nTime he could not give to us.\n\nIf you are job hunting right now — find something that pays you well enough to live.\n\nBut also gives you time to drop your kids to school.\n\nThat is the job worth having.\n\nGo find it.\n\n#JobSearch #FresherJobs #LifeLesson",
         ]
     else:
         print("Generating thread with Claude...")
