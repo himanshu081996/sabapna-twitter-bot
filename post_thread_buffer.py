@@ -179,23 +179,80 @@ def main():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("No ANTHROPIC_API_KEY — using hardcoded test thread")
         tweets = [
-            "My father gave 31 years to a job.\n\nOn his last day I asked: any regrets?\n\nHe did not mention the salary.\nHe did not mention the missed promotions.\n\nWhat he said instead — I was not ready for it. 🧵",
-
-            f"I share stories like this because they matter.\n\nIf you are searching for work right now — {WEBSITE_URL} posts fresh jobs daily. Freshers, graduates, everyone welcome.\n\nNow. My father's story. 👇",
-
-            "His name is Rajendra.\n\nGovernment clerk. District office. Haryana.\n\nJoined in 1993 at age 24.\nSalary: ₹3,400/month.\n\nHe wore the same two formal shirts for the first 4 years.\nWashed them every night. Ironed them every morning.\n\nNobody at the office ever knew.",
-
-            "He woke up at 5:30am every single day for 31 years.\n\nNo alarm needed. His body just knew.\n\nRain. Fever. Back pain. The day after my grandfather died.\n\nHe showed up.\n\nI was always asleep when he left.\n\nWe never once had breakfast together on a weekday.\n\nI only realized this when I was 19.",
-
-            "When I was 14 I asked him why he never switched jobs.\n\nHalf our colony had moved to private companies.\nEveryone was talking about better salaries.\n\nHe looked at me and said:\n\n\"Beta, security matters more than salary.\nA government job means your family never sleeps hungry.\"\n\nI nodded. I did not argue.\n\nBut something about that answer never sat right with me.",
-
-            "Things I found out about later. From my mother. Never from him.\n\n• His best friend's wedding in Chandigarh — he could not get leave.\n• My school annual function where I got first prize — he was in a file audit.\n• Our only family trip to Shimla — he got called back on day 2.\n\nHe never mentioned any of it.\n\nNot once.",
-
-            "Last month he retired.\n\n31 years. Same desk. Same chair. Same office.\n\nSalary when he joined: ₹3,400/month.\nSalary when he retired: ₹41,000/month.\n\n31 years. ₹37,600 raise.\n\nThat is ₹1,213 per year.\n\nHis colleagues had a small lunch. Someone made a card. Everyone signed it.\n\nHe came home at 4pm with a cardboard box of his belongings.\n\nPut it in the corner of the bedroom. Did not say anything.",
-
-            "That evening I sat with him.\n\nJust the two of us.\n\nI asked: \"Papa, any regrets?\"\n\nHe was quiet for a long time.\n\nI thought he would say the salary.\nOr the promotion that went to someone else in 2009.\nOr the transfer request that was rejected 3 times.\n\nHe said none of that.\n\nHe looked at me and said:\n\n\"I wish I had dropped you to school more.\"\n\nThat was it.\n\n31 years. And that was the only thing he wished he had done differently.",
-
-            f"Fresh jobs at {WEBSITE_URL} 👇\nFind work that pays fairly. And gives you time.\n\n—\n\nMy father gave 31 years to a desk.\n\nHis only regret is time.\n\nTime he could not give to us.\n\nIf you are job hunting right now — find something that pays you well enough to live.\n\nBut also gives you time to drop your kids to school.\n\nThat is the job worth having.\n\nGo find it.\n\n#JobSearch #FresherJobs #LifeLesson",
+            "HR called me after 4 rounds.
+ 
+\"We would like to move forward.\"
+ 
+I said great.
+ 
+She said the offer is ready.
+ 
+I said send it over.
+ 
+She did.
+ 
+I stared at the number for a long time.
+ 
+Then I called back.
+ 
+Me : I think there is a mistake.
+ 
+HR : There is no mistake.
+ 
+Me : This is 40% below what the posting said.
+ 
+HR : The posting range is for senior profiles.
+ 
+Me : I have 4 years of experience. Your JD said 3-5 years.
+ 
+HR : Yes but internally we calibrate differently.
+ 
+Me : You called me after round 1 and said I was exactly what the team was looking for.
+ 
+HR : You are. We love your profile.
+ 
+Me : Then why is the offer ₹9 LPA for a role posted at ₹15-20?
+ 
+HR : Budget constraints.
+ 
+Me : When did the budget change?
+ 
+HR : (Silence)
+ 
+Me : I spent 3 weeks on this process.
+Took a day off for the in-person round.
+Turned down another interview to prioritize this.
+ 
+HR : We really do value your time.
+ 
+Me : Does the team know what you are offering me?
+ 
+HR : The offer has been approved by the hiring manager.
+ 
+Me : And he is okay offering ₹9 for a ₹15-20 role?
+ 
+HR : This is our best and final offer.
+ 
+Me : I have to decline.
+ 
+HR : I am sorry to hear that. Is there any flexibility on your end?
+ 
+Me : You just said it was your best and final offer.
+ 
+HR : (Silence)
+ 
+Me : Good luck with your search.
+ 
+I hung up.
+ 
+They called back the next day.
+ 
+New offer : ₹14 LPA.
+ 
+Same role. Same team. Same manager.
+ 
+The budget that did not exist yesterday
+existed the moment I said no.",
         ]
     else:
         print("Generating thread with Claude...")
