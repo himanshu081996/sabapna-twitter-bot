@@ -2,7 +2,7 @@ name: Sabapna - Auto Post Every Hour (9am-8pm IST)
 
 on:
   schedule:
-    - cron: "30 3 * * *"   # 9am  IST
+    - cron: "30 3 * * *"   # 9am  IST-1
     - cron: "30 4 * * *"   # 10am IST
     - cron: "30 5 * * *"   # 11am IST
     - cron: "30 6 * * *"   # 12pm IST
