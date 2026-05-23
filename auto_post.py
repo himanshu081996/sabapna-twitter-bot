@@ -17,7 +17,7 @@ BUFFER_CHANNEL_ID = "6a0c3e98090476fb99371f8e"
 BUFFER_API_URL = "https://api.buffer.com"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 MODEL = "llama-3.3-70b-versatile"
-CSV_FILE = "TwExport_Simon_Ingari_Posts__1_.csv"
+CSV_FILE = "simon.csv"
 
 # ── 50 Topic Seeds ────────────────────────────────────────────────────────────
 TOPIC_SEEDS = [
