@@ -203,6 +203,7 @@ RULES:
 - Hero: Employee / Candidate — real human reactions
 - Ending: 2 to 3 short narrator lines — ironic, devastating, quotable
 - No hashtags, no emojis, no links, no title
+- NEVER use real names like Rahul, Priya, Amit etc — only use role names: Employee, Manager, HR, CEO, Candidate, Boss
 - Return ONLY the story"""
 
     return call_groq(
