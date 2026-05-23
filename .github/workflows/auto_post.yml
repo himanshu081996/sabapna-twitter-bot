@@ -1,0 +1,41 @@
+name: Sabapna - Auto Post Every Hour (9am-8pm IST)
+
+on:
+  schedule:
+    - cron: "30 3 * * *"   # 9am  IST
+    - cron: "30 4 * * *"   # 10am IST
+    - cron: "30 5 * * *"   # 11am IST
+    - cron: "30 6 * * *"   # 12pm IST
+    - cron: "30 7 * * *"   # 1pm  IST
+    - cron: "30 8 * * *"   # 2pm  IST
+    - cron: "30 9 * * *"   # 3pm  IST
+    - cron: "30 10 * * *"  # 4pm  IST
+    - cron: "30 11 * * *"  # 5pm  IST
+    - cron: "30 12 * * *"  # 6pm  IST
+    - cron: "30 13 * * *"  # 7pm  IST
+    - cron: "30 14 * * *"  # 8pm  IST
+
+  workflow_dispatch:
+
+jobs:
+  auto-post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run auto post
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: python auto_post.py
