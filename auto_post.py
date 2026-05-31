@@ -317,7 +317,7 @@ def call_groq(system: str, user: str, max_tokens: int = 800) -> str:
     response = requests.post(
         GROQ_API_URL,
         headers={
-            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Authorization": f"Bearer {os.environ['GROQ_API_KEY']}",
             "Content-Type": "application/json"
         },
         json={
