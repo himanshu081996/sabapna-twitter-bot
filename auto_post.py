@@ -646,7 +646,7 @@ RULES:
 - No specific company names, no hashtags, no links
 - Return ONLY the story"""
 
-        user = f"Write a story where the dialogue feels like real exhausted humans talking, not robots. Topic:\n\n{topic}"
+        user = f"Write a story where the dialogue feels like real exhausted humans talking, not robots. IMPORTANT: Add a blank line between EVERY exchange. Topic:\n\n{topic}"
 
     result = call_groq(system=system, user=user, max_tokens=900)
     print(f"Format selected: {content_format}")
