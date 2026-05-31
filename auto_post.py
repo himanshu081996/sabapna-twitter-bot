@@ -251,7 +251,6 @@ def call_groq(system: str, user: str, max_tokens: int = 1500) -> str:
 
 
 def generate_topic(viral_context: str) -> str:
-    """Generate fresh topic using random seeds."""
     seeds = random.sample(TOPIC_SEEDS, 3)
     seeds_text = "\n".join("- " + s for s in seeds)
 
@@ -261,25 +260,23 @@ These real posts went viral on Twitter — study the style:
 
 {viral_context}
 
-Now generate ONE original workplace injustice topic for a Twitter story.
+Generate ONE original workplace injustice topic for Indian professionals.
 
-Use ONE of these situation seeds as inspiration — but write a completely fresh, specific, human topic sentence around it:
+Use ONE of these seeds as inspiration:
 
 {seeds_text}
 
-Rules:
-- Pick the seed that feels most emotionally powerful
-- Write ONE specific topic sentence inspired by it — not a copy of it
-- Make it feel like it happened to a specific real person in India
-- Include one specific detail (years, salary, role, timing) to make it real
-- One sentence only — punchy and clear
+STRICT RULES:
+- One sentence only — maximum 15 words
+- Must use Indian context — salaries in LPA, real situation
+- NEVER use dollar signs or US context
+- NEVER mention specific companies like Infosys, TCS, Wipro
+- Include one specific detail (years, LPA amount, months, role)
+- Return ONLY the topic sentence — nothing else"""
 
-Return ONLY the topic sentence. Nothing else."""
-
-    return call_groq(system=system, user="Generate the topic now.", max_tokens=120)
+    return call_groq(system=system, user="Generate topic now. Max 15 words. Indian context. LPA only.", max_tokens=60)
 
 
-# Content format weights — 40% story, 30% tips, 20% question, 10% hook
 CONTENT_FORMATS = (
     ["story"] * 4 +
     ["tips"] * 3 +
@@ -288,143 +285,372 @@ CONTENT_FORMATS = (
 )
 
 
-def generate_story(topic: str, viral_context: str) -> str:
-    """Generate viral content using Groq — varies format each time."""
+def load_viral_examples(csv_path: str, top_n: int = 5) -> str:
+    with open(csv_path, 'r', encoding='utf-8-sig') as f:
+        reader = csv.DictReader(f)
+        posts = list(reader)
 
+    posts_sorted = sorted(posts, key=lambda x: int(x.get('View Count', 0) or 0), reverse=True)
+
+    seen = set()
+    top_posts = []
+    skip_words = ['cv', 'resume', 'ats', 'linkedin tip', 'interview tip', 'hire me']
+
+    for p in posts_sorted:
+        if p['Text'] in seen:
+            continue
+        seen.add(p['Text'])
+        if any(word in p['Text'].lower() for word in skip_words):
+            continue
+        top_posts.append(p)
+        if len(top_posts) >= top_n:
+            break
+
+    context = ""
+    for i, p in enumerate(top_posts):
+        context += f"EXAMPLE {i+1} — {int(p['View Count']):,} views:\n\n{p['Text']}\n\n{'='*40}\n\n"
+
+    return context
+
+
+def call_groq(system: str, user: str, max_tokens: int = 800) -> str:
+    response = requests.post(
+        GROQ_API_URL,
+        headers={
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": MODEL,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.9
+        }
+    )
+
+    data = response.json()
+    if "error" in data:
+        raise Exception(f"Groq error: {data['error']}")
+
+    return data["choices"][0]["message"]["content"].strip()
+
+
+def generate_topic(viral_context: str) -> str:
+    seeds = random.sample(TOPIC_SEEDS, 3)
+    seeds_text = "\n".join("- " + s for s in seeds)
+
+    system = f"""You are a viral Twitter content strategist for Indian workplace audience.
+
+These real posts went viral on Twitter — study the style:
+
+{viral_context}
+
+Generate ONE original workplace injustice topic for Indian professionals.
+
+Use ONE of these seeds as inspiration:
+
+{seeds_text}
+
+STRICT RULES:
+- One sentence only — maximum 15 words
+- Must use Indian context — salaries in LPA, real situation
+- NEVER use dollar signs or US context
+- NEVER mention specific companies like Infosys, TCS, Wipro
+- Include one specific detail (years, LPA amount, months, role)
+- Return ONLY the topic sentence — nothing else"""
+
+    return call_groq(system=system, user="Generate topic now. Max 15 words. Indian context. LPA only.", max_tokens=60)
+
+
+def generate_story(topic: str, viral_context: str) -> str:
     content_format = random.choice(CONTENT_FORMATS)
 
     if content_format == "tips":
         system = """You are a viral Twitter content writer for Indian workplace audience.
 
-Write a short punchy tips/list post. MAX 150 words total.
+Write a tips post that feels like real insider knowledge — something a senior professional whispers to a junior colleague.
 
-FORMAT:
-Line 1: One shocking/bold statement (the hook). Make it specific with numbers.
-Blank line.
-4-5 numbered tips. Each tip max 10 words. Specific and actionable for Indian professionals.
-Blank line.
-End with ONE question to drive replies.
+FORMAT — follow this EXACTLY with blank lines between every element:
 
-EXAMPLE:
-Most Indians leave 5-8 LPA on the table every year. Here's why.
+Line 1-2: Shocking hook with specific Indian numbers. No company names. Make it sting.
 
-1. First offer is never the best offer — always counter
-2. Internal raises average 8%. Switching gives 30-40%.
-3. Low base salary compounds against you for years
-4. Companies budget 20% above offer — they expect negotiation
-5. One conversation can add 50L to your 10 year earnings
+[blank line]
 
-Have you ever negotiated your salary? What happened? 👇
+One short setup sentence that creates curiosity and makes people want to read all 5 tips.
+Examples of good setup lines:
+"Here is what nobody tells freshers before it costs them years:"
+"I learned this the hard way so you don't have to:"
+"Most people figure this out 5 years too late:"
+"What HR knows but will never tell you:"
+"The 5 things I wish I knew before wasting 3 years:"
+
+[blank line]
+
+Tip 1: [10-15 words of real specific advice]
+
+[blank line]
+
+Tip 2: [10-15 words of real specific advice]
+
+[blank line]
+
+Tip 3: [10-15 words of real specific advice]
+
+[blank line]
+
+Tip 4: [10-15 words of real specific advice]
+
+[blank line]
+
+Tip 5: [10-15 words of real specific advice]
+
+[blank line]
+
+One personal emotional question ending with 👇
+
+GOOD EXAMPLE (copy this spacing exactly):
+You stayed 8 years. They gave you 9% hike.
+The new hire doing your job gets 6 LPA more.
+
+Here is what nobody tells you before it is too late:
+
+1. Never reveal your current salary — say "I'm looking for X LPA"
+
+2. Always have a competing offer before you negotiate — leverage is everything
+
+3. Internal hikes average 8-10%. Switching gives 25-40%. The math is simple.
+
+4. Apply quietly while still employed — never resign without an offer letter in hand
+
+5. Your loyalty is not an asset to them. Your market value is. Know the difference.
+
+Have you ever realized too late that you stayed somewhere too long? 👇
+
+BAD EXAMPLE — never write like this:
+10 years at company, still 18 LPA.
+1. Document achievements monthly
+2. Get certified in emerging tech — 20% pay hike guaranteed
+3. Skip one level, get 25% hike
+
+(Bad because: uses company name, tips sound fake and guaranteed, no line spacing)
 
 RULES:
 - Indian context, salaries in LPA
-- No hashtags, no emojis except 👇
+- NEVER mention specific companies like Infosys, TCS, Wipro, Accenture
+- Tips must be real tactics — never say "guaranteed" or fake percentages
+- Blank line between EVERY element — hook, setup, each tip, question
+- No hashtags, emojis only 👇 at end
 - Return ONLY the post"""
 
-        user = f"Write a tips post about: {topic}"
+        user = f"Write a tips post with blank lines between every element. Topic: {topic}"
 
     elif content_format == "question":
         system = """You are a viral Twitter content writer for Indian workplace audience.
 
-Write a short controversial question post that sparks debate. MAX 50 words.
+Write a short controversial statement + question. MAX 40 words total.
+
+Must make an Indian professional stop scrolling and want to reply.
 
 FORMAT:
-Line 1-2: One bold controversial statement about Indian work culture. Specific, punchy.
+Line 1: Bold controversial truth about Indian work culture. Specific and stinging.
+Line 2: One more line that deepens the pain.
 Blank line.
-Line 3: Direct question that makes people want to reply.
-Line 4: "Drop your answer 👇" or "Yes or No? 👇"
+Line 3: Direct personal question.
+Line 4: "Agree or disagree? 👇" or "Yes or No? 👇" or "Drop your story 👇"
 
-EXAMPLES:
-Indian companies don't reward performance. They reward visibility.
+GOOD EXAMPLES:
 
-The best performer in your team is probably the lowest paid.
+Indian companies reward the loudest person in the room, not the hardest worker.
 
-Agree or disagree? 👇
+The quietest high performer is always the most underpaid.
+
+Has this been your experience? 👇
 
 ---
 
-Switching jobs every 2 years is not disloyalty. It's financial intelligence.
+Your company gave 8% hike. You switched and got 35%.
 
-Has job hopping ever worked in your favor? 👇
+The math was always simple. You just trusted them too long.
+
+Has switching ever changed your financial life? 👇
+
+---
+
+Loyalty in Indian IT means accepting less so your company can pay more to a new hire.
+
+Drop your story 👇
+
+BAD EXAMPLE — too weak and generic:
+Is experience overrated in Indian IT?
+Agree or disagree? 👇
 
 RULES:
-- Max 50 words
-- Must make Indian professionals feel seen or slightly angry
-- No hashtags
+- Max 40 words
+- Must feel personal and specific to Indian professionals
+- No hashtags, no dollar signs
 - Return ONLY the post"""
 
-        user = f"Write a debate question post inspired by: {topic}"
+        user = f"Write an emotional debate question post about: {topic}"
 
     elif content_format == "hook_story":
         system = f"""You are a viral Twitter content writer for Indian workplace audience.
 
-Write a SHORT punchy hook + mini story. MAX 120 words.
+Write a hook + mini story that stops the scroll. Bigger conversation than usual.
 
-FORMAT:
-Line 1-2: POWERFUL HOOK — specific numbers, shocking statement, relatable pain.
-Blank line.
-3-5 exchanges of dialogue (just the key moment — not full story)
-Blank line.
-1 line lesson/takeaway
-1 question to drive replies 👇
+FORMAT — follow spacing exactly:
 
-EXAMPLE:
+Line 1: SHOCKING HOOK — specific number, years, salary. Hits immediately.
+Line 2: One line that makes it worse.
+
+[blank line]
+
+8-10 dialogue exchanges. Each line 12-18 words. Real emotional human conversation.
+Blank line between each exchange.
+
+[blank line]
+
+ONE devastating truth line — ironic, not a question.
+
+[blank line]
+
+Short question with 👇
+
+GOOD EXAMPLE (copy spacing and conversation length exactly):
 Your junior who you trained is now earning 8 LPA more than you.
-This is not an accident. This is policy.
+The company called it "market correction." You call it betrayal.
 
-Manager: We value your loyalty here.
-Employee: My loyalty or my silence?
+Manager: We really value everything you've brought to this team over the years.
+
+Employee: You valued it at 14 LPA for 4 years while he started at 22 LPA.
+
+Manager: Salary bands are determined at the time of hiring, not by tenure.
+
+Employee: I trained him for 3 months. He didn't know our systems at all.
+
+Manager: He came in with strong negotiation skills during his offer process.
+
+Employee: Nobody told me I could negotiate when I joined. I trusted the process.
+
+Manager: That information has always been available to candidates who ask.
+
+Employee: I've been here 4 years. I've never missed a deadline. Not once.
+
+Manager: We genuinely appreciate your dedication to the team.
+
+Employee: My EMI is 58,000 a month. I haven't asked for a raise in 2 years.
+
 Manager: (Silence)
 
-Companies don't reward loyalty. They rely on it.
+Employee: I have an offer. 21 LPA. I wanted to give you a chance first.
 
-Has this happened to you? 👇
+Manager: Let's explore what we can do on our end.
+
+Employee: Where was this conversation 2 years ago?
+
+Loyalty was never the deal. You just thought it was.
+
+Has this been your experience? 👇
 
 RULES:
-- Indian context, salaries in LPA
-- NEVER use real names — only Employee, Manager, HR, CEO, Candidate, Boss
-- Hook must use specific numbers or relatable situation
+- Indian context, salaries in LPA, no dollar signs
+- Blank line between EVERY exchange
+- Each line 12-18 words — complete emotional thought
+- Contractions are essential: I've, don't, we'll, that's, you're
+- NEVER use real names or company names
+- Characters: Employee, Manager, HR, CEO, Candidate, Boss only
+- No hashtags
 - Return ONLY the post"""
 
-        user = f"Write a hook + mini story about: {topic}"
+        user = f"Write a hook + mini story with blank lines between every exchange. Make conversation bigger and more emotional. Topic: {topic}"
 
     else:
-        # Story format — condensed and punchy
         system = f"""You are a viral Twitter content writer for Indian workplace audience.
 
-Study these real viral posts and copy their style exactly:
+Study these real viral posts and copy their exact style:
 
 {viral_context}
 
-Write a SHORT punchy workplace dialogue story. MAX 200 words.
+Write a workplace dialogue story that feels like a real conversation overheard in an office.
 
-KEY RULES FROM VIRAL EXAMPLES:
-- Start with the most tense moment — no setup needed
-- Write like real humans talk — contractions, interruptions, short reactions
-- "Interesting." "Wait… what?" "Noted." — these beat long sentences
-- Villain sounds reasonable — that's what makes it devastating
-- Hero reacts like a real person — shock, quiet anger, resignation
-- Specific numbers make it real (years, LPA, days, %)
-- One personal detail makes hero human (EMI, father's treatment, child's school)
-- Each line 8 to 15 words — complete thought, not too short, not too long
+STUDY THIS PERFECT EXAMPLE AND COPY THE STYLE EXACTLY:
 
-STRUCTURE:
-Hook line (1-2 lines setting the scene — punchy)
-Blank line
-10-14 dialogue exchanges (SHORT — under 10 words each)
-Blank line
-2 narrator lines (ironic devastating truth)
-1 question line 👇
+---
+Employee: I've been here 5 years. My appraisal was Outstanding. Again.
+
+Manager: We really value everything you bring to the team.
+
+Employee: The new joiner in my team is earning 8 LPA more than me.
+
+Manager: Salary bands are determined by the time of hiring, not performance.
+
+Employee: I trained him for 3 months. He arrived knowing nothing.
+
+Manager: He negotiated well during his offer process.
+
+Employee: I didn't know I was allowed to negotiate. Nobody told me.
+
+Manager: That information is available to everyone.
+
+Employee: My EMI is 62,000 a month. I've been managing on this for 2 years.
+
+Manager: We understand that cost of living has gone up.
+
+Employee: Then why hasn't my salary?
+
+Manager: We'll take this up during the next compensation cycle.
+
+Employee: You said the same thing last year.
+
+Manager: (Silence)
+
+Employee: I have an offer for 14 LPA. I wanted to give you a chance first.
+
+Manager: We might be able to look at a retention discussion.
+
+Employee: Where was this conversation 2 years ago?
+
+He accepted the offer the next day.
+
+The company posted a "we're hiring" job for his role the following week.
+
+Same role. Higher salary band. For someone new.
+
+Has this ever happened to you? 👇
+---
+
+WHAT MAKES THIS WORK:
+- Lines are 10-18 words — complete thoughts, real human speech
+- Emotion builds slowly — frustration, exhaustion, quiet anger
+- "I didn't know I was allowed to negotiate. Nobody told me." — this is devastating because it's true
+- Manager always sounds calm and reasonable — that's what makes it infuriating
+- Personal detail (EMI 62,000) makes us feel the employee's pressure
+- "Where was this conversation 2 years ago?" — hero's best line, quiet and devastating
+- Ending is ironic — company immediately posts higher salary for same role
+
+NOW write a completely NEW original story. Different topic, different situation, same emotional quality.
 
 RULES:
-- Indian workplace context, salaries in LPA
+- Each dialogue line must be 10-18 words — complete thought, real human emotion
+- NO short choppy lines like "That's my work." or "Noted." — these kill the emotion
+- Contractions are essential: "I've", "I'm", "don't", "you've", "we'll", "that's"
+- Indian workplace context — salaries in LPA, no dollar signs
+- One personal detail that makes hero human (EMI, sick family member, child, financial pressure)
+- Villain sounds professional and calm throughout — never aggressive
+- Hero sounds tired and human — not angry, not formal, just real
+- 14-18 dialogue exchanges
+- End with 2 ironic narrator lines + 1 short question with 👇
 - NEVER use real names — only Employee, Manager, HR, CEO, Candidate, Boss
-- No hashtags, no links, no title
+- No specific company names, no hashtags, no links
 - Return ONLY the story"""
 
-        user = f"Write the condensed story about:\n\n{topic}"
+        user = f"Write a story where the dialogue feels like real exhausted humans talking, not robots. Topic:\n\n{topic}"
 
-    return call_groq(system=system, user=user, max_tokens=800)
+    result = call_groq(system=system, user=user, max_tokens=900)
+    print(f"Format selected: {content_format}")
+    return result
 
 
 def post_to_buffer(tweet_text: str) -> str:
@@ -488,7 +714,7 @@ def main():
     # Generate story
     print("Step 2: Generating story...")
     story = generate_story(topic, viral_context)
-    print(f"\n--- STORY ---\n{story}\n-------------")
+    print(f"\n--- POST ---\n{story}\n------------")
     print(f"Chars: {len(story)} | Words: {len(story.split())}\n")
 
     # Post to Buffer
